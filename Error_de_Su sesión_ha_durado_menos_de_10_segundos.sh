@@ -7,4 +7,4 @@ if [ $(id -u) != "0" ] || [ ! $SUDO_USER ]; then
 fi
 echo -n "\n_________licencia GPL 3.0_________"
 HOME=$(cat /etc/passwd | grep $SUDO_USER | awk -F: '{print $6}')
-chown $SUDO_USER $HOME/.ICEauthority
+chown $SUDO_USER $HOME/.ICEauthority && chmod 600 $SUDO_USER $HOME/.ICEauthority
