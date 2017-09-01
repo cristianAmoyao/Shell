@@ -1,48 +1,39 @@
 #!/bin/bash
-clear
-echo "_________licencia GPL 3.0_________"
-echo "=================================="
-echo "==========Ayuda==================="
-echo "r = read (lectura) "
-echo "w = write(escritura)"
-echo "x = execution (ejecucion)"
-echo "=================================="
-echo "=================================="
-echo "   "
-ls -l .ICE*
-echo "   "
-echo "   "
-echo "Pregunta:"
-echo "   "
-echo "¿aparece esto?"
-echo "-rw------- "
-echo "¿o similar?"
-echo "===Opciones===="
-echo "1) si"
-echo "2) no"
-echo -n "Respuesta:  "
 
-read opcion 
-case $opcion in
-1)echo "su usuario es : $USER";
-read -p "¿Cual es su usuario?:  " user
-echo "sudo chown _"$user"_ .ICEauthority" >>reparar.sh;
-echo "   ";
-clear
-echo "se ejecutara el siguiente comando";cat reparar.sh;
-echo "iniciando script..."
-echo "para cancelar presione Ctrl + c"
-sleep 1
-echo "3"
-sleep 1
-echo "2"
-sleep 1
-echo "1"
-sleep 1
-sh reparar.sh ;;
+echo "_________licencia GPL 3.0_________
+=================================="
+# Obtenemos dirección completa del archivo para que pueda
+# ser ejecutado en cualquier sitio
+file="$HOME/.ICEauthority" 
 
+# Creamos opciones para el menú básico
+OPT="Eliminar Cambiar Nada"
 
-2)exit ;;
-esac
+# Obtenemos el nombre del propietario del archivo
+owner=$(stat -c %U $file )
 
-
+# Compararemos el propietario con el usuario
+# Si no es igual, pediremos respuesta
+if [ $owner != $USER ]; then
+    echo "El archivo pertenece a $owner"
+    select opt in $OPT; do
+        if [ "$opt" = "Eliminar" ]; then
+            echo "Será elminado, después reinicie sesión"
+            #TODO mover $file a $file.back
+            exit
+        elif [ "$opt" = "Cambiar" ]; then
+            # Usamos el Handler de SUDO en terminal para obtener privilegios
+            # Se le pedira contraseña al usuario, el scrip terminara en caso de error
+            sudo -S chown $USER $file
+            echo "Terminado, se cambio $owner por $USER"
+            exit
+        elif [ "$opt" = "Nada" ]; then
+            exit
+        else
+            # En caso de que la opción no sea identificada, poner lo necesario aca
+            echo "Opción no identificada"
+        fi
+    done
+else
+    echo "Propietario correcto, terminando."
+fi
